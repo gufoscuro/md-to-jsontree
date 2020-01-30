@@ -22,7 +22,9 @@ module.exports.markdown_to_jsontree = (markdown) => {
             currentDepth    = 0,
             resultObject    = null,
             objectsMap      = { },
-            isList          = false;
+            isList          = false,
+            latestListItem  = null,
+            listItemCount   = 0;
         
         linear.forEach ((item, index) => {
             // console.log ('==>', item.type);
@@ -33,12 +35,13 @@ module.exports.markdown_to_jsontree = (markdown) => {
                         text: item.text,
                         children: []      
                     }
+                    
 
                     if (resultObject === null) {
                         resultObject = entry;
                         currentDepth = item.depth;
                         objectsMap[currentDepth] = entry;
-                    } else if (currentDepth < item.depth) {
+                    } else if (item.depth > currentDepth) {
                         objectsMap[currentDepth].children.push (entry);
                         currentDepth = item.depth;
                         objectsMap[currentDepth] = entry;
@@ -46,13 +49,24 @@ module.exports.markdown_to_jsontree = (markdown) => {
                         objectsMap[currentDepth - 1].children.push (entry);
                         objectsMap[currentDepth] = entry;
                     } else {
-                        objectsMap[currentDepth - 2].children.push (entry);
-                        objectsMap[currentDepth - 1] = entry;
+                        var par_depth = currentDepth - (currentDepth - item.depth) - 1,
+                            ent_depth = par_depth + 1;
+                               
+                        objectsMap[par_depth].children.push (entry);
+                        objectsMap[ent_depth] = entry;
                         currentDepth = item.depth;
                     }
 
                     // console.log (currentDepth);
 
+                    break;
+                case 'code':
+                    if (objectsMap[currentDepth]) {
+                        objectsMap[currentDepth].children.push ({
+                            type: 'code',
+                            text: item.text
+                        })
+                    }
                     break;
                 case 'list_start':
                     isList = true;
@@ -60,7 +74,19 @@ module.exports.markdown_to_jsontree = (markdown) => {
                 case 'list_end':
                     isList = false;
                     break;
+                case 'list_item_start':
+                    latestListItem = {
+                        type: 'list',
+                        text: ''
+                    }
+                    break;
+                case 'list_item_end':
+                    if (objectsMap[currentDepth]) {
+                        objectsMap[currentDepth].children.push (latestListItem)
+                    }
+                    break;
                 case 'space':
+                    // console.log ('space', item)
                     break;
                 case 'paragraph':
                     if (objectsMap[currentDepth]) {
@@ -71,10 +97,18 @@ module.exports.markdown_to_jsontree = (markdown) => {
                     }
                     break;
                 case 'text':
+                    // console.log ('>> text', item.text, item)
                     var type = isList ? 'list' : 'text';
-                    if (objectsMap[currentDepth]) {
+
+                    if (isList) {
+                        if (latestListItem) {
+                            latestListItem.text += ((latestListItem !== '' ? ' ' : '') + item.text);
+                        }
+                    } 
+                    
+                    else if (objectsMap[currentDepth]) {
                         objectsMap[currentDepth].children.push ({
-                            type: type,
+                            type: 'text',
                             text: item.text
                         })
                     }
