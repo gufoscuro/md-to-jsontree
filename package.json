@@ -1,0 +1,31 @@
+{
+  "name": "md-to-jsontree",
+  "version": "0.8.0",
+  "description": "Allows to parse a markdown document and obtain a JSON hierarchical representation of it",
+  "main": "index.js",
+  "dependencies": {
+    "marked": "^0.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gufoscuro/md-to-jsontree.git"
+  },
+  "keywords": [
+    "markdown",
+    "json",
+    "tree",
+    "hierarchical",
+    "md",
+    "md-to-jsontree"
+  ],
+  "author": "Lorenzo Fontana",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/gufoscuro/md-to-jsontree/issues"
+  },
+  "homepage": "https://github.com/gufoscuro/md-to-jsontree#readme"
+}
