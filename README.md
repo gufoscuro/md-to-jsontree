@@ -4,7 +4,7 @@
 
 ```
 const mdToJson = require ('apif-doc')
-mdToJson.parse (json).then (function (json) {
+mdToJson.parse (markdown).then (function (json) {
     // use JSON somehow ...
 })
 ```
